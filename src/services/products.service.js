@@ -1,8 +1,8 @@
-import ProductoDAO from "../daos/products.dao";
+import ProductoDAO from "../daos/products.dao.js";
 
 export default class ProductService {
   constructor() {
-    this.ProductDAO = new Product();
+    this.ProductDAO = new ProductoDAO(); // Cambiado de ProductDAO a ProductoDAO
   }
 
   async getAllProducts() {
@@ -15,9 +15,10 @@ export default class ProductService {
     }
   }
 
-  async getProductById() {
+  async getProductById(id) {
+    // Añadido parámetro id
     try {
-      const product = await this.ProductDAO.getProductById();
+      const product = await this.ProductDAO.getProductById(id); // Añadido parámetro id
       if (!product) {
         throw new Error("Producto no encontrado");
       }
