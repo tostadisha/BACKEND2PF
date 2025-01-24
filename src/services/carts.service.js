@@ -31,7 +31,6 @@ export default class CartService {
   }
   async addProductToCart(cartId, productId, quantity) {
     const cart = await this.CartDAO.findById(cartId);
-    console.log(cart);
     const productIndex = cart.products.findIndex(
       (product) => product._id.toString() === productId
     );
@@ -40,7 +39,10 @@ export default class CartService {
     } else {
       cart.products.push({ _id: productId, quantity });
     }
-    return await cart.save();
+    await cart.save();
+    console.log(cart);
+    const cartPopulated = await this.CartDAO.findByIdPopulated(cartId);
+    return cartPopulated;
   }
   async getCartById(id) {
     try {

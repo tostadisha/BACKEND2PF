@@ -12,9 +12,15 @@ export default class CartDAO {
   };
   findById = async (id) => {
     try {
+      return await cartsModel.findById(id).lean(false);
+    } catch (error) {
+      throw new Error(`Error al buscar el carrito: ${error.message}`);
+    }
+  };
+  findByIdPopulated = async (id) => {
+    try {
       const cartPopulated = await cartsModel
         .findById(id)
-        .lean(false)
         .populate("products._id");
       // const cartModified = {
       //   _id: cartPopulated._id,
@@ -59,39 +65,6 @@ export default class CartDAO {
       return await cartsModel.findByIdAndDelete(id);
     } catch (error) {
       throw new Error(`Error al eliminar el carrito: ${error.message}`);
-    }
-  };
-  addProductToCart = async (cartId, productId, quantity) => {
-    try {
-      // Buscar el carrito usando findById directamente desde el modelo
-      const cart = await cartsModel.findById(cartId);
-
-      if (!cart) {
-        throw new Error("Carrito no encontrado");
-      }
-
-      // Verificar si el producto ya está en el carrito
-      const productIndex = cart.products.findIndex(
-        (product) => product._id.toString() === productId
-      );
-
-      if (productIndex !== -1) {
-        // Si el producto ya existe, incrementar la cantidad
-        cart.products[productIndex].quantity += quantity;
-      } else {
-        // Si no existe, agregar un nuevo producto
-        cart.products.push({ _id: productId, quantity });
-      }
-
-      // Guardar los cambios directamente en el documento original
-      const updatedCart = await cart.save();
-
-      // Devolver el carrito actualizado
-      return updatedCart;
-    } catch (error) {
-      throw new Error(
-        `Error al agregar el producto al carrito: ${error.message}`
-      );
     }
   };
 }

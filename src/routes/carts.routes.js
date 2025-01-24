@@ -13,5 +13,5 @@ router.use(passport.authenticate("jwt", { session: false }));
 
 router.post("/", authorization(["user"]), createCart);
 router.post("/product/:productId", authorization(["user"]), addProductToCart);
-export default router;
 router.get("/:id", authorization(["user"]), getCartById);
+export default router;
