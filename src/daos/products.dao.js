@@ -11,7 +11,7 @@ export default class ProductDAO {
     }
   };
 
-  getByID = async (id) => {
+  getById = async (id) => {
     try {
       return await productModel.findById(id);
     } catch (error) {

@@ -4,7 +4,7 @@ import { login, register, logout } from "../controllers/auth.controller.js";
 
 const router = Router();
 
-router.post("/login", passportCall("local"), login);
+router.post("/login", passportCall("login"), login);
 router.post("/register", passportCall("register"), register);
 router.get("/logout", logout);
 

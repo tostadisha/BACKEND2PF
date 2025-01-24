@@ -16,9 +16,8 @@ export default class ProductService {
   }
 
   async getProductById(id) {
-    // Añadido parámetro id
     try {
-      const product = await this.ProductDAO.getProductById(id); // Añadido parámetro id
+      const product = await this.ProductDAO.getById(id); // Añadido parámetro id
       if (!product) {
         throw new Error("Producto no encontrado");
       }
@@ -33,7 +32,7 @@ export default class ProductService {
       const newProduct = await this.ProductDAO.addProduct(product);
       return newProduct;
     } catch (error) {
-      throw new Error("Hubo un error al intentar agregar el producto");
+      throw new Error("Hubo un error al intentar agregar el producto.");
     }
   }
 

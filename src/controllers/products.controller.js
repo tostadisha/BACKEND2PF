@@ -34,16 +34,29 @@ export const getProductById = async (req, res) => {
 
 export const addProduct = async (req, res) => {
   try {
-    const { name, price, category, description } = req.body;
-    if (!name || !price || !category || !description) {
-      return res.sendBadRequest("Falta información en el item a añadir");
+    const { name, price, category, description, stock } = req.body;
+    if (!name || typeof name !== "string") {
+      return res.sendBadRequest(
+        "El nombre es obligatorio y debe ser un string."
+      );
     }
-    if (stock < 0 || stock === 0 || stock === undefined) {
-      return res.sendBadRequest("Revise el valor del stock");
+    if (typeof price !== "number" || price <= 0) {
+      return res.sendBadRequest("El precio debe ser un número mayor a 0.");
     }
-    if (price < 0 || price === 0 || price === undefined) {
-      return res.sendBadRequest("Revise el valor del precio");
+    if (!category || typeof category !== "string") {
+      return res.sendBadRequest(
+        "La categoría es obligatoria y debe ser un string."
+      );
     }
+    if (!description || typeof description !== "string") {
+      return res.sendBadRequest(
+        "La descripción es obligatoria y debe ser un string."
+      );
+    }
+    if (typeof stock !== "number" || stock <= 0) {
+      return res.sendBadRequest("El stock debe ser un número mayor a 0.");
+    }
+
     const newProduct = await productService.addProduct(req.body);
     res.sendCreated(newProduct);
   } catch (error) {

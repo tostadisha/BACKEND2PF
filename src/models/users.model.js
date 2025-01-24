@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "user",
   },
+  assignedCart: String,
 });
 
 export default mongoose.model("users", userSchema);

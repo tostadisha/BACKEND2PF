@@ -7,7 +7,7 @@ import authRoutes from "./routes/auth.routes.js";
 import DbConnection from "./config/dbConnection.js";
 import { generateCustomResponses } from "./utils/generateCustomResponses.js";
 import { config } from "./config/config.js";
-import initializePassport from "./config/passport.js"; // Importar initializePassport
+import initializePassport from "./config/auth.config.js";
 
 const app = express();
 
@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(passport.initialize());
-initializePassport(); // Llamar a initializePassport
+initializePassport();
 app.use(generateCustomResponses);
 
 app.use("/api/products", productRoutes);
