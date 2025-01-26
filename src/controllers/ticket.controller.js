@@ -3,6 +3,7 @@ import UserService from "../services/user.service.js";
 import CartService from "../services/carts.service.js";
 import ProductService from "../services/products.service.js";
 import { v4 as uuidv4 } from "uuid";
+import { transport, config } from "../config/config.js";
 
 const ticketService = new TicketService();
 const userService = new UserService();
@@ -11,8 +12,7 @@ const productService = new ProductService();
 
 export const purchaseCart = async (req, res) => {
   try {
-    console.log("Hola");
-    const user = await userService.getUserByEmail(req.user.email);
+    const user = await userService.getUserByEmail(req.user.email, false);
     if (!user) {
       return res.sendNotFound("Usuario no encontrado.");
     }
@@ -21,9 +21,10 @@ export const purchaseCart = async (req, res) => {
     if (!cartId) {
       return res.sendBadRequest("El usuario no tiene un carrito asignado.");
     }
-    console.log("Paso 1");
     // Obtener el carrito
     const cart = await cartService.getCartById(cartId);
+    console.log("El carrito");
+    console.log(cart);
     if (!cart || cart.products.length === 0) {
       return res.sendBadRequest("El carrito está vacío o no existe.");
     }
@@ -58,20 +59,48 @@ export const purchaseCart = async (req, res) => {
       // Calcular el monto total
       totalAmount += product.price * item.quantity;
     }
-    console.log(totalAmount);
+    const fecha = new Date();
+
+    const year = fecha.getFullYear();
+    const month = String(fecha.getMonth() + 1).padStart(2, "0");
+    const day = String(fecha.getDate()).padStart(2, "0");
+
+    const hours = String(fecha.getHours()).padStart(2, "0");
+    const minutes = String(fecha.getMinutes()).padStart(2, "0");
+    const seconds = String(fecha.getSeconds()).padStart(2, "0");
+
+    const formato = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    console.log(formato); // Ejemplo: 26/01/2025 14:35:09
+
     // Crear un ticket
     const ticket = await ticketService.createTicket({
       code: uuidv4(),
-      purchase_datetime: new Date(),
+      purchase_datetime: formato,
       amount: totalAmount,
       purchaser: user.email,
     });
     console.log(ticket.amount);
     // Vaciar el carrito
     await cartService.emptyCart(cartId);
+    const result = await transport.sendMail({
+      from: config.email_mailing,
+      to: user.email,
+      subject: "Ticket de compra",
+      html: `<h1>Ticket de compra</h1>
+      <p>Código: ${ticket.code}</p>
+      <p>Monto: $ ${ticket.amount} AR$</p>
+      <p>Fecha: ${ticket.purchase_datetime}</p>,
+      <p>Comprador:  ${ticket.purchaser}</p>`,
+      attachments: [],
+    });
 
     res.sendSuccess([
-      { message: "Compra realizada con éxito.", ticket, productsNotProcessed },
+      {
+        message: "Compra realizada con éxito.",
+        ticket,
+        productsNotProcessed,
+        email: result,
+      },
       "Se ha registrado el ticker",
     ]);
   } catch (error) {

@@ -55,11 +55,14 @@ export default class UserService {
   }
 
   // Obtener usuario por ID y devolverlo como DTO
-  async getUserById(id) {
+  async getUserById(id, DTO = true) {
     try {
       const user = await this.UserDAO.getById(id);
       if (!user) throw new Error("Usuario no encontrado");
-      return new UserDTO(user);
+      if (DTO) {
+        return new UserDTO(user);
+      }
+      return user;
     } catch (error) {
       throw new Error("Hubo un error al intentar obtener el usuario");
     }

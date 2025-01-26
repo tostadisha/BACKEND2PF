@@ -16,4 +16,5 @@ router.post("/", authorization(["user"]), createCart);
 router.post("/product/:productId", authorization(["user"]), addProductToCart);
 router.get("/:id", authorization(["user"]), getCartById);
 router.post("/purchase", authorization(["user"]), purchaseCart);
+
 export default router;

@@ -13,7 +13,7 @@ export const createCart = async (req, res) => {
       return res.sendBadRequest("El ID del usuario es requerido");
     }
 
-    const user = await userService.getUserById(userId);
+    const user = await userService.getUserById(userId, false);
     if (!user) {
       return res.sendBadRequest("Usuario no encontrado");
     }
@@ -50,8 +50,7 @@ export const addProductToCart = async (req, res) => {
   try {
     const { productId } = req.params;
     const { quantity } = req.body;
-    const user = await userService.getUserById(req.user._id);
-    console.log(user);
+    const user = await userService.getUserById(req.user._id, false);
     const cartId = user.assignedCart;
     if (!cartId) {
       return res.sendBadRequest("El usuario no tiene un carrito asignado");
@@ -79,7 +78,7 @@ export const addProductToCart = async (req, res) => {
 };
 export const emptyCart = async (req, res) => {
   try {
-    const user = await userService.getUserById(req.user._id);
+    const user = await userService.getUserById(req.user._id, false);
     if (!user) {
       return res.sendNotFound("Usuario no encontrado");
     }
@@ -103,6 +102,7 @@ export const getCartById = async (req, res) => {
     }
 
     const cart = await cartService.getCartById(id);
+    console.log(cart);
     res.sendSuccess(cart, "Carrito encontrado");
   } catch (error) {
     res.sendServerError(error);
