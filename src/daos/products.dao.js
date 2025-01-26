@@ -10,7 +10,13 @@ export default class ProductDAO {
       throw new Error(`Error al obtener todos los productos: ${error.message}`);
     }
   };
-
+  getProduct = async (input) => {
+    try {
+      return await productModel.findOne({ name: input });
+    } catch (error) {
+      throw new Error(`Error al obtener el producto: ${error.message}`);
+    }
+  };
   getById = async (id) => {
     try {
       return await productModel.findById(id);

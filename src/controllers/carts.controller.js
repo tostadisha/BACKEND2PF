@@ -28,13 +28,9 @@ export const createCart = async (req, res) => {
     const cart = await cartService.createCart({});
     await userService.updateUser(userId, { assignedCart: cart._id });
     res.cookie("user", JSON.stringify(user), { httpOnly: true, secure: true });
-
-    res.sendSuccess({
-      message: "Carrito creado y asignado correctamente",
-      cart,
-    });
+    res.sendCreated(cart, "Carrito creado y asignado correctamente");
   } catch (error) {
-    res.sendServerError(error.message);
+    res.sendServerError(error);
   }
 };
 export const deleteCart = async (req, res) => {
@@ -45,7 +41,7 @@ export const deleteCart = async (req, res) => {
     }
 
     const deletedCart = await cartService.deleteCart(cartId);
-    res.sendSuccess(deletedCart);
+    res.sendSuccess(deletedCart, "Carrito eliminado correctamente");
   } catch (error) {
     res.sendServerError(error.message);
   }
@@ -76,9 +72,27 @@ export const addProductToCart = async (req, res) => {
       productId,
       quantity || 1
     );
-    res.sendSuccess(updatedCart);
+    res.sendSuccess(updatedCart, "Producto añadido al carrito correctamente");
   } catch (error) {
     res.sendServerError(error.message);
+  }
+};
+export const emptyCart = async (req, res) => {
+  try {
+    const user = await userService.getUserById(req.user._id);
+    if (!user) {
+      return res.sendNotFound("Usuario no encontrado");
+    }
+
+    const cartId = user.assignedCart;
+    if (!cartId) {
+      return res.sendBadRequest("El usuario no tiene un carrito asignado");
+    }
+
+    const emptyCart = await cartService.emptyCart(cartId);
+    res.sendSuccess(emptyCart, "Carrito vaciado correctamente");
+  } catch (error) {
+    res.sendServerError(error);
   }
 };
 export const getCartById = async (req, res) => {
@@ -89,8 +103,8 @@ export const getCartById = async (req, res) => {
     }
 
     const cart = await cartService.getCartById(id);
-    res.sendSuccess(cart);
+    res.sendSuccess(cart, "Carrito encontrado");
   } catch (error) {
-    res.sendServerError(error.message);
+    res.sendServerError(error);
   }
 };

@@ -21,6 +21,14 @@ export default class CartService {
       throw new Error("Hubo un error al intentar eliminar el carrito");
     }
   }
+  async emptyCart(id) {
+    try {
+      const emptyCart = await this.CartDAO.emptyCart(id);
+      return emptyCart;
+    } catch (error) {
+      throw new Error("Hubo un error al intentar vaciar el carrito");
+    }
+  }
   async updateCart(id, cart) {
     try {
       const updatedCart = await this.CartDAO.updateCart(id, cart);

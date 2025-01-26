@@ -2,7 +2,7 @@ import ProductoDAO from "../daos/products.dao.js";
 
 export default class ProductService {
   constructor() {
-    this.ProductDAO = new ProductoDAO(); // Cambiado de ProductDAO a ProductoDAO
+    this.ProductDAO = new ProductoDAO();
   }
 
   async getAllProducts() {
@@ -15,12 +15,17 @@ export default class ProductService {
     }
   }
 
+  async getProduct(input) {
+    try {
+      const product = await this.ProductDAO.getProduct(input);
+      return product;
+    } catch (error) {
+      throw new Error("Hubo un error al intentar conseguir el producto");
+    }
+  }
   async getProductById(id) {
     try {
-      const product = await this.ProductDAO.getById(id); // Añadido parámetro id
-      if (!product) {
-        throw new Error("Producto no encontrado");
-      }
+      const product = await this.ProductDAO.getById(id);
       return product;
     } catch (error) {
       throw new Error("Hubo un error al intentar conseguir el producto");

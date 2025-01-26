@@ -1,5 +1,5 @@
 import ProductService from "../services/products.service.js";
-
+import { generateCustomResponses } from "../utils/generateCustomResponses.js";
 const productService = new ProductService();
 
 export const getAllProducts = async (req, res) => {
@@ -8,7 +8,7 @@ export const getAllProducts = async (req, res) => {
     if (!products || products.length === 0) {
       return res.sendNotFound("No se han encontrado productos");
     }
-    res.sendSuccess(products);
+    res.sendSuccess(products, "Productos encontrados");
   } catch (error) {
     res.sendServerError(error);
   }
@@ -26,7 +26,7 @@ export const getProductById = async (req, res) => {
         `No se ha encontrado un producto con el ID: ${id}`
       );
     }
-    res.sendSuccess(product);
+    res.sendSuccess(product, "Producto encontrado");
   } catch (error) {
     res.sendServerError(error);
   }
@@ -34,31 +34,42 @@ export const getProductById = async (req, res) => {
 
 export const addProduct = async (req, res) => {
   try {
-    const { name, price, category, description, stock } = req.body;
+    const { name, price, category, stock } = req.body;
+    console.log(name, price, category, stock);
+
+    // Validación de name
     if (!name || typeof name !== "string") {
       return res.sendBadRequest(
         "El nombre es obligatorio y debe ser un string."
       );
     }
+
+    // Validación de precio
     if (typeof price !== "number" || price <= 0) {
       return res.sendBadRequest("El precio debe ser un número mayor a 0.");
     }
+
+    // Validación de categoría
     if (!category || typeof category !== "string") {
       return res.sendBadRequest(
         "La categoría es obligatoria y debe ser un string."
       );
     }
-    if (!description || typeof description !== "string") {
-      return res.sendBadRequest(
-        "La descripción es obligatoria y debe ser un string."
-      );
-    }
+
+    // Validación de stock
     if (typeof stock !== "number" || stock <= 0) {
       return res.sendBadRequest("El stock debe ser un número mayor a 0.");
     }
 
+    // Verificar si el producto ya existe
+    const exist = await productService.getProduct(name);
+    if (exist) {
+      return res.sendBadRequest("El producto ya existe.");
+    }
+
+    // Crear el nuevo producto
     const newProduct = await productService.addProduct(req.body);
-    res.sendCreated(newProduct);
+    res.sendCreated(newProduct, "Producto creado correctamente");
   } catch (error) {
     res.sendServerError(error);
   }
@@ -93,7 +104,7 @@ export const updateProduct = async (req, res) => {
     }
 
     const updatedProduct = await productService.updateProduct(id, updates);
-    res.sendSuccess(updatedProduct);
+    res.sendSuccess(updatedProduct, "El producto ha sido actualizado");
   } catch (error) {
     res.sendServerError(error);
   }
@@ -112,7 +123,7 @@ export const deleteProduct = async (req, res) => {
       );
     }
     const deletedProduct = await productService.deleteProduct(id);
-    res.sendSuccess(deletedProduct);
+    res.sendSuccess(deletedProduct, "El producto ha sido eliminado");
   } catch (error) {
     res.sendServerError(error);
   }

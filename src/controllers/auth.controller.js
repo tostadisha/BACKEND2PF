@@ -11,11 +11,13 @@ export const login = async (req, res) => {
       return res.sendBadRequest("Credenciales inválidas");
     }
     const token = generateToken(user);
-    res.cookie("proyectoCookie", token, { httpOnly: true }).sendSuccess({
-      message: "Login correcto",
-      user: `Sesión iniciada como ${user.email}`,
-      role: user.role,
-    });
+    res.cookie("proyectoCookie", token, { httpOnly: true }).sendSuccess(
+      {
+        user: `Sesión iniciada como ${user.email}`,
+        role: user.role,
+      },
+      "Login correcto"
+    );
   } catch (error) {
     res.sendServerError(error);
   }
@@ -40,6 +42,6 @@ export const register = async (req, res) => {
   }
 };
 
-export const logout = (req, res) => {
+export const logout = (_, res) => {
   res.clearCookie("proyectoCookie").sendSuccess({ message: "Logout correcto" });
 };

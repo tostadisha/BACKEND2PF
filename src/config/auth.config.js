@@ -79,13 +79,15 @@ const initializePassport = () => {
           return done(null, false, { message: "Faltan datos" });
         }
         try {
-          const user = await userService.getUserByEmail(username);
+          const user = await userService.getUserByEmail(username, false);
           if (!user) {
             return done(null, false, { message: "Usuario no encontrado" });
           }
+          const hashedPassword = user.password;
+          console.log(password, hashedPassword);
           const isPasswordValid = await isValidPassword(
             password,
-            user.password
+            hashedPassword
           );
           if (!isPasswordValid) {
             return done(null, false, { message: "Contraseña incorrecta" });
