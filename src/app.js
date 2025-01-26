@@ -4,6 +4,7 @@ import passport from "passport";
 import productRoutes from "./routes/products.routes.js";
 import cartRoutes from "./routes/carts.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import currentRoute from "./routes/current.routes.js";
 import DbConnection from "./config/dbConnection.js";
 import { generateCustomResponses } from "./utils/generateCustomResponses.js";
 import { config } from "./config/config.js";
@@ -22,6 +23,7 @@ app.use(generateCustomResponses);
 app.use("/api/products", productRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/current", currentRoute);
 
 DbConnection.getInstance();
 

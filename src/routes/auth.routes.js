@@ -1,6 +1,11 @@
 import { Router } from "express";
 import { passportCall } from "../utils/passportCall.js";
-import { login, register, logout } from "../controllers/auth.controller.js";
+import {
+  login,
+  register,
+  logout,
+  current,
+} from "../controllers/auth.controller.js";
 
 const router = Router();
 

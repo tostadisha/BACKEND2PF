@@ -45,3 +45,24 @@ export const register = async (req, res) => {
 export const logout = (_, res) => {
   res.clearCookie("proyectoCookie").sendSuccess({ message: "Logout correcto" });
 };
+
+export const current = (req, res) => {
+  try {
+    console.log(req.user);
+    let user = req.user;
+    if (!user) {
+      return res.sendBadRequest("No hay una sesión activa");
+    }
+    res.sendSuccess({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      assignedCArt: user.assignedCart
+        ? "Cart already assigned"
+        : "Cart not assigned",
+    });
+  } catch (error) {
+    res.sendServerError(error);
+  }
+};
