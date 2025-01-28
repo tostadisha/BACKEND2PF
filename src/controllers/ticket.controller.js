@@ -12,27 +12,28 @@ const productService = new ProductService();
 
 export const purchaseCart = async (req, res) => {
   try {
+    const { cid } = req.params;
     const user = await userService.getUserByEmail(req.user.email, false);
     if (!user) {
       return res.sendNotFound("Usuario no encontrado.");
     }
-
-    const cartId = user.assignedCart;
+    const cartId = cid;
     if (!cartId) {
       return res.sendBadRequest("El usuario no tiene un carrito asignado.");
     }
     // Obtener el carrito
     const cart = await cartService.getCartById(cartId);
-    console.log("El carrito");
-    console.log(cart);
+    if (cartId !== user.assignedCart) {
+      return res.sendBadRequest(
+        "El carrito pasado por params no coincide con el previamente asignado al usuario."
+      );
+    }
     if (!cart || cart.products.length === 0) {
       return res.sendBadRequest("El carrito está vacío o no existe.");
     }
-
     const productsNotProcessed = [];
+    const cartNotProccesed = [];
     let totalAmount = 0;
-    console.log("paso 2");
-    // Procesar cada producto en el carrito
     for (const item of cart.products) {
       console.log();
       const product = await productService.getProductById(item._id._id);
@@ -49,15 +50,18 @@ export const purchaseCart = async (req, res) => {
           name: product.name,
           reason: "Stock insuficiente",
         });
+        cartNotProccesed.push(product);
         continue;
       }
 
-      // Actualizar el stock del producto
       product.stock -= item.quantity;
       await product.save();
-
-      // Calcular el monto total
       totalAmount += product.price * item.quantity;
+    }
+    if (cartNotProccesed.length > 0) {
+      await cartService.updateCart(cartId, cartNotProccesed);
+    } else {
+      await cartService.emptyCart(cartId);
     }
     const fecha = new Date();
 
@@ -70,7 +74,6 @@ export const purchaseCart = async (req, res) => {
     const seconds = String(fecha.getSeconds()).padStart(2, "0");
 
     const formato = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-    console.log(formato); // Ejemplo: 26/01/2025 14:35:09
 
     // Crear un ticket
     const ticket = await ticketService.createTicket({
@@ -79,9 +82,6 @@ export const purchaseCart = async (req, res) => {
       amount: totalAmount,
       purchaser: user.email,
     });
-    console.log(ticket.amount);
-    // Vaciar el carrito
-    await cartService.emptyCart(cartId);
     const result = await transport.sendMail({
       from: config.email_mailing,
       to: user.email,

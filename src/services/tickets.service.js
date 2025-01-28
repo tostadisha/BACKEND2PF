@@ -8,12 +8,4 @@ export default class TicketService {
   async createTicket(ticketData) {
     return await this.TicketDAO.createTicket(ticketData);
   }
-
-  async getTicketById(id) {
-    return await this.TicketDAO.getTicketById(id);
-  }
-
-  async deleteTicket(id) {
-    return await this.TicketDAO.deleteTicket(id);
-  }
 }

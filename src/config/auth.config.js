@@ -58,6 +58,7 @@ const initializePassport = () => {
             email: username,
             password: hashedPassword,
           });
+          console.log(user);
           return done(null, user);
         } catch (error) {
           return done(error);

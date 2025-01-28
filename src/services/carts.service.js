@@ -29,14 +29,17 @@ export default class CartService {
       throw new Error("Hubo un error al intentar vaciar el carrito");
     }
   }
-  async updateCart(id, cart) {
+  async updateCart(id, newProducts) {
     try {
-      const updatedCart = await this.CartDAO.updateCart(id, cart);
+      const updatedCart = await this.CartDAO.updateCart(id, {
+        products: newProducts,
+      });
       return updatedCart;
     } catch (error) {
       throw new Error("Hubo un error al intentar actualizar el carrito");
     }
   }
+
   async addProductToCart(cartId, productId, quantity) {
     const cart = await this.CartDAO.findById(cartId);
     const productIndex = cart.products.findIndex(

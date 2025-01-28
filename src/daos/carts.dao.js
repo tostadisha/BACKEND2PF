@@ -22,19 +22,6 @@ export default class CartDAO {
       const cartPopulated = await cartsModel
         .findById(id)
         .populate("products._id");
-      // const cartModified = {
-      //   _id: cartPopulated._id,
-      //   products: cartPopulated.products.map((product) => {
-      //     return {
-      //       _id: product._id._id,
-      //       name: product._id.name,
-      //       price: product._id.price,
-      //       quantity: product.quantity,
-      //       stock: product._id.stock,
-      //       category: product._id.category,
-      //     };
-      //   }),
-      // };
       return cartPopulated;
     } catch (error) {
       throw new Error(`Error al buscar el carrito: ${error.message}`);

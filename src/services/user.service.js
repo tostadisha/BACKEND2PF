@@ -6,20 +6,17 @@ export default class UserService {
     this.UserDAO = new UserDAO();
   }
 
-  // Crear usuario y devolverlo como DTO
   async createUser(user) {
     try {
+      const exist = await this.UserDAO.getByEmail(user.email);
+      if (exist) throw new Error("El usuario ya existe");
       const newUser = await this.UserDAO.addUser(user);
-      console.log(newUser);
-      const userDTO = new UserDTO(newUser);
-      console.log(userDTO);
-      return userDTO;
+      return newUser;
     } catch (error) {
       throw new Error("Hubo un error al intentar crear el usuario");
     }
   }
 
-  // Obtener usuario por email y devolverlo como DTO
   async getUserByEmail(email, DTO = true) {
     try {
       const user = await this.UserDAO.getByEmail(email);
@@ -33,9 +30,10 @@ export default class UserService {
     }
   }
 
-  // Eliminar usuario (sin transformación, ya que no hay datos devueltos)
   async deleteUser(id) {
     try {
+      const user = await this.UserDAO.getById(id);
+      if (!user) throw new Error("Usuario no encontrado");
       const deletedUser = await this.UserDAO.deleteUser(id);
       return deletedUser;
     } catch (error) {
@@ -43,7 +41,6 @@ export default class UserService {
     }
   }
 
-  // Actualizar usuario y devolverlo como DTO
   async updateUser(id, user) {
     try {
       const updatedUser = await this.UserDAO.updateUser(id, user);
@@ -54,7 +51,6 @@ export default class UserService {
     }
   }
 
-  // Obtener usuario por ID y devolverlo como DTO
   async getUserById(id, DTO = true) {
     try {
       const user = await this.UserDAO.getById(id);
@@ -68,7 +64,6 @@ export default class UserService {
     }
   }
 
-  // Obtener todos los usuarios y devolver una lista de DTOs
   async getUsers() {
     try {
       const users = await this.UserDAO.getAllUsers();
